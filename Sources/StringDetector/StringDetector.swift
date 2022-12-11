@@ -143,7 +143,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
             stackView.leadingAnchor.constraint(equalTo: cutoutView.leadingAnchor, constant: 10),
             stackView.trailingAnchor.constraint(equalTo: cutoutView.trailingAnchor, constant: -10),
-            stackView.bottomAnchor.constraint(equalTo: cutoutView.bottomAnchor, constant: -40),
+            stackView.bottomAnchor.constraint(equalTo: cutoutView.bottomAnchor, constant: -20),
 
             textLabel.heightAnchor.constraint(equalToConstant: 44),
             saveButton.heightAnchor.constraint(equalToConstant: 44)
