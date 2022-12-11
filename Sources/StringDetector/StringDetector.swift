@@ -104,6 +104,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         textLabel.textColor = .black
         textLabel.numberOfLines = 0
         textLabel.font = UIFont(name: "Menlo Regular", size: showPrettyPrinted ? 17 : 20) //.preferredFont(forTextStyle: .body)
+        textLabel.adjustsFontSizeToFitWidth = true
         textLabel.adjustsFontForContentSizeCategory = true
         textLabel.isUserInteractionEnabled = true
         textLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(togglePrettyPrint(_:))))
@@ -140,8 +141,8 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             cutoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
 
-            stackView.leadingAnchor.constraint(equalTo: cutoutView.leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(equalTo: cutoutView.trailingAnchor, constant: -20),
+            stackView.leadingAnchor.constraint(equalTo: cutoutView.leadingAnchor, constant: 10),
+            stackView.trailingAnchor.constraint(equalTo: cutoutView.trailingAnchor, constant: -10),
             stackView.bottomAnchor.constraint(equalTo: cutoutView.bottomAnchor, constant: -40),
 
             textLabel.heightAnchor.constraint(equalToConstant: 44),
