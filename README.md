@@ -22,7 +22,7 @@ Add a package by selecting `File` → `Add Packages…` in Xcode’s menu bar.
 
 Search for the StringDetector iOS SDK using the repo's URL:
 ```console
-https://github.com/snabble/snabble-ios-sdk.git
+https://github.com/utilem/string-detector-ios.git
 ```
 
 Next, set the **Dependency Rule** to be `Up to Next Major Version` and specify `1.0` as the lower bound.
