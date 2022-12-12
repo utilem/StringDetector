@@ -9,7 +9,7 @@
 
 import Vision
 import AVFoundation
-import UIKit
+//import UIKit
 
 extension StringDetectorViewController {
     

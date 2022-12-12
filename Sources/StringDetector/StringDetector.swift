@@ -56,11 +56,11 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
     let previewView = PreviewView()
     var isPausing = false
     
-    static let prettyPrintKey = "com.even-u.PrettyPrintedString"
-    
-    var showPrettyPrinted : Bool {
-        return UserDefaults.standard.bool(forKey: Self.prettyPrintKey)
-    }
+//    static let prettyPrintKey = "com.even-u.PrettyPrintedString"
+    @AppStorage("com.even-u.PrettyPrintedString") var showPrettyPrinted: Bool = true
+//    var showPrettyPrinted : Bool {
+//        return UserDefaults.standard.bool(forKey: Self.prettyPrintKey)
+//    }
 
     deinit {
         debugPrint(#function, #file, #line)
@@ -452,9 +452,11 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         }
     }
     @IBAction func togglePrettyPrint(_ sender: UITapGestureRecognizer) {
-        let value = showPrettyPrinted
+//        let value = showPrettyPrinted
         
-        UserDefaults.standard.set(!value, forKey: Self.prettyPrintKey)
+        self.showPrettyPrinted = !showPrettyPrinted
+        
+//        UserDefaults.standard.set(!value, forKey: Self.prettyPrintKey)
         
         guard let text = textLabel.text else {
             return
