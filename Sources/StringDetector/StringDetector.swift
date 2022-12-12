@@ -17,21 +17,18 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
     private let textLabel = UILabel()
     private let saveButton = UIButton(type: .roundedRect)
     private let stackView = UIStackView()
-    
+
     private var permissionGranted = false // Flag for permission
-    
+
     private var captureSession: AVCaptureSession?
     private var sessionQueue: DispatchQueue?
-    
+
     var stringTracker: StringTracker?
-    
+
     // Detector
     private var videoOutput: AVCaptureVideoDataOutput?
     var request: VNRecognizeTextRequest?
-    
-    var boxLayer = [CAShapeLayer]()
-    var maskLayer : CAShapeLayer?
-    
+
     // MARK: - Region of interest (ROI) and text orientation
     // Region of video data output buffer that recognition should be run on.
     // Gets recalculated once the bounds of the preview layer are known.
@@ -39,7 +36,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
     // Orientation of text to search for in the region of interest.
     var textOrientation = CGImagePropertyOrientation.up
     var currentOrientation = UIDeviceOrientation.portrait
-    
+
     // MARK: - Coordinate transforms
     var bufferAspectRatio: Double!
     // Transform from UI orientation to buffer orientation.
@@ -48,32 +45,25 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
     var bottomToTopTransform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: -1)
     // Transform coordinates in ROI to global coordinates (still normalized).
     var roiToGlobalTransform = CGAffineTransform.identity
-    
+
     // Vision -> AVF coordinate transform.
     var visionToAVFTransform = CGAffineTransform.identity
-    
+
     let cutoutView = UIView()
     let previewView = PreviewView()
+
+    var boxLayer = [CAShapeLayer]()
+    var maskLayer : CAShapeLayer?
+    
+    @AppStorage("com.even-u.PrettyPrintedString") var showPrettyPrinted: Bool = true
     var isPausing = false
     
-//    static let prettyPrintKey = "com.even-u.PrettyPrintedString"
-    @AppStorage("com.even-u.PrettyPrintedString") var showPrettyPrinted: Bool = true
-//    var showPrettyPrinted : Bool {
-//        return UserDefaults.standard.bool(forKey: Self.prettyPrintKey)
-//    }
-
-    deinit {
-        debugPrint(#function, #file, #line)
-        stringTracker = nil
-    }
-    var layoutContraints: [NSLayoutConstraint] = []
-  
     var screenRect: CGRect {
         return CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
     }
+
     let size: CGSize
     let model: StringDetector
-    
 
     init(model: StringDetector) {
         self.model = model
@@ -81,29 +71,34 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    deinit {
+        debugPrint(#function, #file, #line)
+        stringTracker = nil
+    }
+
     func setupView() {
-        
+
         view.backgroundColor = .systemBackground
-        
+
         previewView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         view.addSubview(previewView)
         
         cutoutView.translatesAutoresizingMaskIntoConstraints = false
         cutoutView.backgroundColor = UIColor.gray.withAlphaComponent(0.5)
-        
+
         view.addSubview(cutoutView)
-        
+
         textLabel.translatesAutoresizingMaskIntoConstraints = false
         textLabel.text = ""
         textLabel.textColor = .black
         textLabel.numberOfLines = 0
-        textLabel.font = UIFont(name: "Menlo Regular", size: showPrettyPrinted ? 17 : 20) //.preferredFont(forTextStyle: .body)
+        textLabel.font = UIFont(name: "Menlo Regular", size: showPrettyPrinted ? 17 : 20)
         textLabel.adjustsFontSizeToFitWidth = true
         textLabel.adjustsFontForContentSizeCategory = true
         textLabel.isUserInteractionEnabled = true
@@ -111,13 +106,12 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.setTitle(model.applyButtonString, for: .normal)
-        
         saveButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
         saveButton.titleLabel?.adjustsFontForContentSizeCategory = true
         saveButton.isEnabled = true
         saveButton.isUserInteractionEnabled = true
         saveButton.addTarget(self, action: #selector(save(_:)), for: .touchUpInside)
-        
+
         stackView.backgroundColor = .white.withAlphaComponent(0.75)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(textLabel)
@@ -125,21 +119,20 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         stackView.axis = .vertical
         stackView.spacing = 8
         stackView.alignment = .center
-        
+
         cutoutView.addSubview(stackView)
         cutoutView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
         
-        layoutContraints = [
+        NSLayoutConstraint.activate([
             previewView.topAnchor.constraint(equalTo: view.topAnchor),
             previewView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             previewView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             previewView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
+
             cutoutView.topAnchor.constraint(equalTo: view.topAnchor),
             cutoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             cutoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             cutoutView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
 
             stackView.leadingAnchor.constraint(equalTo: cutoutView.leadingAnchor, constant: 10),
             stackView.trailingAnchor.constraint(equalTo: cutoutView.trailingAnchor, constant: -10),
@@ -147,29 +140,27 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
             textLabel.heightAnchor.constraint(equalToConstant: 44),
             saveButton.heightAnchor.constraint(equalToConstant: 44)
-        ]
-        NSLayoutConstraint.activate(layoutContraints)
+        ])
     }
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         self.setupView()
     }
-    
+
     public override func viewWillAppear(_ animated: Bool) {
-        
         super.viewWillAppear(animated)
-        
+
         stringTracker = StringTracker(maxCount: self.model.bestHitCount)
-        
+
         self.stackView.isHidden = true
-        
+
         maskLayer = CAShapeLayer()
         maskLayer?.backgroundColor = UIColor.clear.cgColor
         maskLayer?.fillRule = .evenOdd
         cutoutView.layer.mask = maskLayer
-        
+
         if self.model.cornerRadius > 0 {
             cutoutView.layer.cornerRadius = self.model.cornerRadius
             cutoutView.layer.masksToBounds = true
@@ -184,30 +175,30 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         captureSession = AVCaptureSession()
         sessionQueue = DispatchQueue(label: "sessionQueue")
         previewView.session = captureSession
-       
+
         checkPermission()
 
         sessionQueue?.async { [unowned self] in
             guard permissionGranted else {
                 return
             }
-            
+
             self.setupCaptureSession()
-            
+
             DispatchQueue.main.async {
                 // Figure out initial ROI.
                 self.calculateRegionOfInterest()
             }
-            
+
             self.setupDetector()
         }
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+
         self.captureSession?.stopRunning()
-        
+
         if let inputs = captureSession?.inputs {
             for input in inputs {
                 captureSession?.removeInput(input)
@@ -219,23 +210,22 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         videoOutput = nil
         captureSession = nil
         sessionQueue = nil
-        
+
         maskLayer?.removeFromSuperlayer()
         maskLayer = nil
-        
+
         request = nil
         stringTracker = nil
     }
 
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
-        
+
         let deviceOrientation = UIDevice.current.orientation
         if deviceOrientation.isPortrait || deviceOrientation.isLandscape {
             currentOrientation = deviceOrientation
         }
-        
+
         if let videoPreviewLayerConnection = previewView.videoPreviewLayer.connection {
             if let newVideoOrientation = AVCaptureVideoOrientation(deviceOrientation: deviceOrientation) {
                 videoPreviewLayerConnection.videoOrientation = newVideoOrientation
@@ -244,12 +234,12 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         // Orientation changed: figure out new region of interest (ROI).
         calculateRegionOfInterest()
     }
-    
+
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         updateCutout()
     }
-    
+
     func calculateRegionOfInterest() {
         // In landscape orientation the desired ROI is specified as the ratio of
         // buffer width to height. When the UI is rotated to portrait, keep the
@@ -278,86 +268,85 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             self.updateCutout()
         }
     }
-    
+
     func updateCutout() {
-        
+
         // Figure out where the cutout ends up in layer coordinates.
         let roiRectTransform = bottomToTopTransform.concatenating(uiRotationTransform)
         let cutout = previewView.videoPreviewLayer.layerRectConverted(fromMetadataOutputRect: regionOfInterest.applying(roiRectTransform))
-        
+
         // Create the mask.
         let path = UIBezierPath(rect: cutoutView.frame)
         path.append(UIBezierPath(rect: cutout))
         maskLayer?.path = path.cgPath
     }
-    
+
     func setupOrientationAndTransform() {
-        
+
         let roi = regionOfInterest
         roiToGlobalTransform = CGAffineTransform(translationX: roi.origin.x, y: roi.origin.y).scaledBy(x: roi.width, y: roi.height)
-        
+
         switch currentOrientation {
             // Home button on right
         case .landscapeLeft:
             textOrientation = CGImagePropertyOrientation.up
             uiRotationTransform = CGAffineTransform.identity
-            
+
             // Home button on left
         case .landscapeRight:
             textOrientation = CGImagePropertyOrientation.down
             uiRotationTransform = CGAffineTransform(translationX: 1, y: 1).rotated(by: CGFloat.pi)
-            
+
             // Home button on top
         case .portraitUpsideDown:
             textOrientation = CGImagePropertyOrientation.left
             uiRotationTransform = CGAffineTransform(translationX: 1, y: 0).rotated(by: CGFloat.pi / 2)
-            
+
             // Home button at bottom
         default:
             textOrientation = CGImagePropertyOrientation.right
             uiRotationTransform = CGAffineTransform(translationX: 0, y: 1).rotated(by: -CGFloat.pi / 2)
-            
+
         }
-        
         // Full Vision ROI to AVF transform.
         visionToAVFTransform = roiToGlobalTransform.concatenating(bottomToTopTransform).concatenating(uiRotationTransform)
     }
-    
+
     func checkPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
             // Permission has been granted before
         case .authorized:
             permissionGranted = true
-            
+
             // Permission has not been requested yet
         case .notDetermined:
             requestPermission()
-            
+
         default:
             permissionGranted = false
         }
     }
-    
+
     func requestPermission() {
         guard let sessionQueue = sessionQueue else {
             return
         }
-        
+
         sessionQueue.suspend()
         AVCaptureDevice.requestAccess(for: .video) { [unowned self] granted in
             self.permissionGranted = granted
             sessionQueue.resume()
         }
     }
-    
+
     func setupCaptureSession() {
         // Camera input
         guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera,for: .video, position: .back) else { return }
-        
+
         guard let captureSession = captureSession else {
             return
         }
-        
+
         // NOTE:
         // Requesting 4k buffers allows recognition of smaller text but will
         // consume more power. Use the smallest buffer size necessary to keep
@@ -369,24 +358,24 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             captureSession.sessionPreset = AVCaptureSession.Preset.hd1920x1080
             bufferAspectRatio = 1920.0 / 1080.0
         }
-        
+
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else { return }
-        
+
         guard let videoOutput = videoOutput,
               captureSession.canAddInput(videoDeviceInput) else {
             return
         }
         captureSession.addInput(videoDeviceInput)
-                
+
         // Detector
         videoOutput.alwaysDiscardsLateVideoFrames = true
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sampleBufferQueue"))
         videoOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
-        
+
         captureSession.addOutput(videoOutput)
-        
+
         videoOutput.connection(with: .video)?.preferredVideoStabilizationMode = .off
-        
+
         // Set zoom and autofocus to help focus on very small text.
         do {
             try videoDevice.lockForConfiguration()
@@ -397,16 +386,16 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             print("Could not set zoom level due to error: \(error)")
             return
         }
-        
+
         captureSession.startRunning()
     }
-    
+
     func showString(string: String) {
         sessionQueue?.sync {
             if let session = self.captureSession, session.isRunning {
                 session.stopRunning()
             }
-            
+
             DispatchQueue.main.async {
                 if !self.isPausing {
                     self.model.detectorDidScan(string: nil)
@@ -430,19 +419,19 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             }
         }
     }
-    
+
     @IBAction func save(_ sender: UIButton) {
         guard !isPausing else {
             restartSession()
             return
         }
-        
+
         guard let text = textLabel.text else {
             return
         }
         self.model.detectorDidScan(string: text)
     }
-    
+
     @IBAction func handleTap(_ sender: UITapGestureRecognizer) {
         if let session = self.captureSession, session.isRunning {
             isPausing = true
@@ -451,38 +440,34 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             restartSession()
         }
     }
+
     @IBAction func togglePrettyPrint(_ sender: UITapGestureRecognizer) {
-//        let value = showPrettyPrinted
-        
         self.showPrettyPrinted = !showPrettyPrinted
-        
-//        UserDefaults.standard.set(!value, forKey: Self.prettyPrintKey)
-        
+
         guard let text = textLabel.text else {
             return
         }
-        
+
         if let result = self.model.isPossibleCanditate(string: text) {
             let (_, string) = result
             DispatchQueue.main.async {
                 self.textLabel.text = self.showPrettyPrinted ? self.model.prettyPrinted(string: string) : string
             }
-
         }
     }
 }
 
 public struct StringDetectorView: UIViewControllerRepresentable {
     var model: StringDetector
-    
+
     public init(model: StringDetector) {
         self.model = model
     }
-    
+
     public func makeUIViewController(context: Context) -> UIViewController {
         return StringDetectorViewController(model: model)
     }
-    
+
     public func updateUIViewController(_ uiViewController: UIViewController, context: Context) { }
 }
 
