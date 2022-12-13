@@ -1,4 +1,5 @@
-DetectorModel.swift
+StringDetector.swift
+StringDetectorModel.swift
 Copyright (c) 2022, Uwe Tilemann
 
 Others
