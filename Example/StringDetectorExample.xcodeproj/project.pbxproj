@@ -13,6 +13,7 @@
 		767938F52944B47100F6B7EC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767938F42944B47100F6B7EC /* ContentView.swift */; };
 		767938F72944B47200F6B7EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 767938F62944B47200F6B7EC /* Assets.xcassets */; };
 		767938FA2944B47200F6B7EC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 767938F92944B47200F6B7EC /* Preview Assets.xcassets */; };
+		76DE7A6F29481934000423A2 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DE7A6E29481934000423A2 /* ScannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		767938F42944B47100F6B7EC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		767938F62944B47200F6B7EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		767938F92944B47200F6B7EC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		76DE7A6E29481934000423A2 /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 			children = (
 				767938F22944B47100F6B7EC /* StringDetectorExampleApp.swift */,
 				7613ED8B294588E20052F5EE /* PhoneNumberModel.swift */,
+				76DE7A6E29481934000423A2 /* ScannerView.swift */,
 				767938F42944B47100F6B7EC /* ContentView.swift */,
 				767938F62944B47200F6B7EC /* Assets.xcassets */,
 				767938F82944B47200F6B7EC /* Preview Content */,
@@ -156,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				767938F52944B47100F6B7EC /* ContentView.swift in Sources */,
+				76DE7A6F29481934000423A2 /* ScannerView.swift in Sources */,
 				767938F32944B47100F6B7EC /* StringDetectorExampleApp.swift in Sources */,
 				7613ED8C294588E20052F5EE /* PhoneNumberModel.swift in Sources */,
 			);

@@ -1,13 +1,15 @@
 # StringDetector for iOS
 
 ![Swift 5.0](https://img.shields.io/badge/Swift-5.0-green.svg)
+![iOS 14.0](https://img.shields.io/badge/iOS-14.0-blue.svg)
+![Xcode 12.5](https://img.shields.io/badge/Xcode-12.5-yellow.svg)
 
 
 ## Introduction
-The StringDetector for iOS is based on the sample code from Apples developer site avalable here: 
+The StringDetector package for iOS is based on the sample code from Apples developer site avalable here: 
 [Reading Phone Numbers in Real Time](https://developer.apple.com/documentation/vision/reading_phone_numbers_in_real_time). 
 
-StringDetector for iOS provides a `StringDetector` protocol and default implementation `StringDetectorModel` class to separate UI from the data to detect with the iOS camera. 
+StringDetector provides a `StringDetector` protocol and default implementation `StringDetectorModel` class to separate UI from the data to detect with the iOS camera. 
 
 The `StringDetectorView` is a SwiftUI compontent. See the Xcode StringDetectorExample App to detect US-style phone numbers using SwiftUI.
 
@@ -22,7 +24,7 @@ Add a package by selecting `File` → `Add Packages…` in Xcode’s menu bar.
 
 Search for the StringDetector iOS SDK using the repo's URL:
 ```console
-https://github.com/utilem/string-detector-ios.git
+https://github.com/utilem/StringDetector.git
 ```
 
 Next, set the **Dependency Rule** to be `Branch` and specify `main`.
@@ -37,7 +39,6 @@ The example defines a `PhoneNumberModel` by overriding the default implementatio
 
 ```Swift
 import SwiftUI
-import Combine
 import StringDetector
 
 class PhoneNumberModel: StringDetectorModel {
@@ -76,7 +77,10 @@ The default implementation of the `StringDetectorModel` propagates changes on th
         }
     }
 ```
-![](StringDetectorExample.jpg)
+
+<p align="center">
+  <img src="StringDetectorExample.jpg" />
+</p>
 
 ## Author
 

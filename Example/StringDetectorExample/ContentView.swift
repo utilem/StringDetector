@@ -16,20 +16,6 @@ extension View {
 }
 #endif
 
-struct ScannerView: View {
-    var model: PhoneNumberModel
-    var scannerView: StringDetectorView
-
-    init(model: PhoneNumberModel) {
-        self.model = model
-        self.scannerView = StringDetectorView(model: model)
-   }
-
-    var body: some View {
-        scannerView
-    }
-}
-
 struct ContentView: View {
     @ObservedObject var model: PhoneNumberModel
     
@@ -90,7 +76,6 @@ struct ContentView: View {
     }
     
     var body: some View {
-        // ScannerView(model: model)
         content
     }
 }

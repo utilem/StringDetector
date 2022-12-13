@@ -12,11 +12,11 @@ import AVFoundation
 import UIKit
 
 extension StringDetectorViewController {
-    
+
     func setupDetector() {
         self.request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
     }
-    
+
     // MARK: - Text recognition
     func recognizeTextHandler(request: VNRequest, error: Error?) {
         DispatchQueue.main.async(execute: {
@@ -25,7 +25,7 @@ extension StringDetectorViewController {
             }
         })
     }
-    
+
     func extractDetections(_ results: [VNRecognizedTextObservation]) {
         var numbers = [String]()
         var greenBoxes = [CGRect]()
@@ -33,12 +33,12 @@ extension StringDetectorViewController {
 
         let maximumCandidates = 1
         let drawBoxes = self.model.drawBoxes
-        
+
         for visionResult in results {
             guard let candidate = visionResult.topCandidates(maximumCandidates).first else { continue }
 
             var stringIsSubstring = true
-            
+
             if let result = self.model.isPossibleCanditate(string: candidate.string) {
                 let (range, string) = result
 
@@ -53,20 +53,20 @@ extension StringDetectorViewController {
                 redBoxes.append(visionResult.boundingBox)
             }
         }
-        
+
         stringTracker?.logFrame(strings: numbers)
         if drawBoxes {
             show(boxGroups: [(color: UIColor.red.cgColor, boxes: redBoxes), (color: UIColor.green.cgColor, boxes: greenBoxes)])
         }
-        
+
         if let sureString = stringTracker?.getStableString() {
             showString(string: showPrettyPrinted ? self.model.prettyPrinted(string: sureString) : sureString)
             stringTracker?.reset(string: sureString)
         }
     }
-        
+
     // MARK: - Bounding box drawing
-    
+
     // Draw a box on screen. Must be called from main queue.
     func draw(rect: CGRect, color: CGColor) {
         let layer = CAShapeLayer()
@@ -78,7 +78,7 @@ extension StringDetectorViewController {
 
         previewView.videoPreviewLayer.insertSublayer(layer, at: 1)
     }
-    
+
     // Remove all drawn boxes. Must be called on main queue.
     func removeBoxes() {
         for layer in boxLayer {
@@ -86,9 +86,9 @@ extension StringDetectorViewController {
         }
         boxLayer.removeAll()
     }
-    
+
     typealias ColoredBoxGroup = (color: CGColor, boxes: [CGRect])
-    
+
     // Draws groups of colored boxes.
     func show(boxGroups: [ColoredBoxGroup]) {
         DispatchQueue.main.async {
@@ -103,13 +103,13 @@ extension StringDetectorViewController {
             }
         }
     }
-        
+
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let request = self.request else {
             return
         }
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        
+
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = false
         request.regionOfInterest = regionOfInterest
