@@ -23,7 +23,7 @@ public protocol StringDetecting {
     
     /// - Parameters:
     ///   - string: The string detected or `nil` to reset `self.string`. This occurs when the detector is paused.
-    /// `detectorDidScan(string:)` will be called if `bestHitCount` times a string is detected. If parameter An implementation can you this
+    /// `detectorDidScan(string:)` will be called if `bestHitCount` times a string is detected or with `nil` to reset string.
     func detectorDidScan(string: String?)
 }
 
@@ -42,7 +42,7 @@ public protocol StringDetectingViewModel {
     /// Red boxes will be drawn to visualize partial detected strings in the `regionOfInterest` to be ignored by the detector
     var drawBoxes: Bool { get }
 
-    /// The `String`to be displayed with the apply button for detected strings
+    /// The `String` to be displayed with the apply button for detected strings
     var applyButtonString: String { get }
     /// A tap on the preview area will pause the detector. The `String` will be displayed to restart the detector
     var pauseButtonString: String { get }
