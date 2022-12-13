@@ -78,6 +78,26 @@ The default implementation of the `StringDetectorModel` propagates changes on th
     }
 ```
 
+The `StringDetectingViewModel` protocol defines the function `prettyPrinted(string: String) -> String` 
+to provide a custom format. The `PhoneNumberModel` use this function to reformat the string:
+
+```Swift
+    override func prettyPrinted(string: String) -> String {
+        guard string.count == 10 else {
+            return string
+        }
+        func get(from: Int, to: Int) throws -> String {
+            guard let start = string.index(string.startIndex, offsetBy: from, limitedBy: string.endIndex),
+                  let end = string.index(string.startIndex, offsetBy: to, limitedBy: string.endIndex) else {
+                fatalError("substring \(from)..<\(to) is out of range")
+            }
+            return String(string[start..<end])
+        }
+        return "(\(try! get(from: 0, to: 3)))\(try! get(from: 3, to: 6))-\(try! get(from: 6, to: string.count))"
+    }
+```
+
+
 <p align="center">
   <img src="StringDetectorExample.jpg" />
 </p>

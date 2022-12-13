@@ -12,38 +12,33 @@ import AVFoundation
 import UIKit
 
 extension StringDetectorViewController {
-
+    
     func setupDetector() {
         self.request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
     }
-
+    
     // MARK: - Text recognition
     func recognizeTextHandler(request: VNRequest, error: Error?) {
-        DispatchQueue.main.async(execute: {
-            if let results = request.results as? [VNRecognizedTextObservation] {
-                self.extractDetections(results)
-            }
-        })
-    }
-
-    func extractDetections(_ results: [VNRecognizedTextObservation]) {
+        guard let results = request.results as? [VNRecognizedTextObservation] else {
+            return
+        }
         var numbers = [String]()
         var greenBoxes = [CGRect]()
         var redBoxes = [CGRect]()
-
+        
         let maximumCandidates = 1
         let drawBoxes = self.model.drawBoxes
-
+        
         for visionResult in results {
             guard let candidate = visionResult.topCandidates(maximumCandidates).first else { continue }
-
+            
             var stringIsSubstring = true
-
+            
             if let result = self.model.isPossibleCanditate(string: candidate.string) {
                 let (range, string) = result
-
+                
                 numbers.append(string)
-
+                
                 if drawBoxes, let box = try? candidate.boundingBox(for: range)?.boundingBox {
                     greenBoxes.append(box)
                     stringIsSubstring = !(range.lowerBound == candidate.string.startIndex && range.upperBound == candidate.string.endIndex)
@@ -53,15 +48,23 @@ extension StringDetectorViewController {
                 redBoxes.append(visionResult.boundingBox)
             }
         }
-
+        
         stringTracker?.logFrame(strings: numbers)
-        if drawBoxes {
-            show(boxGroups: [(color: UIColor.red.cgColor, boxes: redBoxes), (color: UIColor.green.cgColor, boxes: greenBoxes)])
+        let sureString = stringTracker?.getStableString()
+        
+        guard sureString != nil || drawBoxes else {
+            return
         }
-
-        if let sureString = stringTracker?.getStableString() {
-            showString(string: showPrettyPrinted ? self.model.prettyPrinted(string: sureString) : sureString)
-            stringTracker?.reset(string: sureString)
+        
+        DispatchQueue.main.async {
+            if drawBoxes {
+                self.show(boxGroups: [(color: UIColor.red.cgColor, boxes: redBoxes), (color: UIColor.green.cgColor, boxes: greenBoxes)])
+            }
+            
+            if let sureString = sureString {
+                self.showString(string: self.showPrettyPrinted ? self.model.prettyPrinted(string: sureString) : sureString)
+                self.stringTracker?.reset(string: sureString)
+            }
         }
     }
 
