@@ -6,7 +6,7 @@
 
 
 ## Introduction
-The StringDetector package for iOS is based on the sample code from Apples developer site avalable here: 
+The StringDetector package for iOS is based on the sample code from Apples developer site available here: 
 [Reading Phone Numbers in Real Time](https://developer.apple.com/documentation/vision/reading_phone_numbers_in_real_time). 
 
 StringDetector provides a `StringDetector` protocol and default implementation `StringDetectorModel` class to separate UI from the data to detect with the iOS camera. 
