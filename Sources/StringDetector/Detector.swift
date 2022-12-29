@@ -9,7 +9,10 @@
 
 import Vision
 import AVFoundation
+
+#if canImport(UIKit)
 import UIKit
+#endif
 
 extension StringDetectorViewController {
     
@@ -57,6 +60,10 @@ extension StringDetectorViewController {
         }
         
         DispatchQueue.main.async {
+            guard self.request != nil else {
+                return
+            }
+
             if drawBoxes {
                 self.show(boxGroups: [(color: UIColor.red.cgColor, boxes: redBoxes), (color: UIColor.green.cgColor, boxes: greenBoxes)])
             }
@@ -94,7 +101,7 @@ extension StringDetectorViewController {
 
     // Draws groups of colored boxes.
     func show(boxGroups: [ColoredBoxGroup]) {
-        DispatchQueue.main.async {
+        //DispatchQueue.main.async {
             let layer = self.previewView.videoPreviewLayer
             self.removeBoxes()
             for boxGroup in boxGroups {
@@ -104,7 +111,7 @@ extension StringDetectorViewController {
                     self.draw(rect: rect, color: color)
                 }
             }
-        }
+        //}
     }
 
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
