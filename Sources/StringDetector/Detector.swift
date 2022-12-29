@@ -58,7 +58,7 @@ extension StringDetectorViewController {
         guard sureString != nil || drawBoxes else {
             return
         }
-        
+
         DispatchQueue.main.async {
             guard self.request != nil else {
                 return
@@ -101,17 +101,15 @@ extension StringDetectorViewController {
 
     // Draws groups of colored boxes.
     func show(boxGroups: [ColoredBoxGroup]) {
-        //DispatchQueue.main.async {
-            let layer = self.previewView.videoPreviewLayer
-            self.removeBoxes()
-            for boxGroup in boxGroups {
-                let color = boxGroup.color
-                for box in boxGroup.boxes {
-                    let rect = layer.layerRectConverted(fromMetadataOutputRect: box.applying(self.visionToAVFTransform))
-                    self.draw(rect: rect, color: color)
-                }
+        let layer = self.previewView.videoPreviewLayer
+        self.removeBoxes()
+        for boxGroup in boxGroups {
+            let color = boxGroup.color
+            for box in boxGroup.boxes {
+                let rect = layer.layerRectConverted(fromMetadataOutputRect: box.applying(self.visionToAVFTransform))
+                self.draw(rect: rect, color: color)
             }
-        //}
+        }
     }
 
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {

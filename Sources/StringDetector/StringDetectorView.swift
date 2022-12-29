@@ -74,10 +74,6 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         self.preferredContentSize = size
     }
     
-//    public init(model: StringDetector) {
-//        init(model: model, size: UIScreen.main.bounds.size)
-//    }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -167,11 +163,6 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
         self.stackView.isHidden = true
 
-//        maskLayer = CAShapeLayer()
-//        maskLayer?.backgroundColor = UIColor.clear.cgColor
-//        maskLayer?.fillRule = .evenOdd
-//        cutoutView.layer.mask = maskLayer
-
         if self.model.cornerRadius > 0 {
             cutoutView.layer.cornerRadius = self.model.cornerRadius
             cutoutView.layer.masksToBounds = true
@@ -211,54 +202,24 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             super.viewWillDisappear(animated)
         }
         
-//        sessionQueue?.sync {
-            guard let session = self.captureSession else { return }
-            
-            if session.isRunning {
-                session.stopRunning()
-            }
-            for input in session.inputs {
-                session.removeInput(input)
-            }
-            if let output = videoOutput {
-                session.removeOutput(output)
-            }
-            self.previewView.session = nil
-            self.videoOutput = nil
-            self.captureSession = nil
-            self.sessionQueue = nil
-//            self.maskLayer?.removeFromSuperlayer()
-//            self.maskLayer = nil
-
-            self.request = nil
-            self.stringTracker = nil
-//        }
+        guard let session = self.captureSession else { return }
         
-//        self.captureSession?.stopRunning()
-//
-//        if let inputs = captureSession?.inputs {
-//            for input in inputs {
-//                captureSession?.removeInput(input)
-//            }
-//        }
-//        if let output = videoOutput {
-//            captureSession?.removeOutput(output)
-//        }
-//        videoOutput = nil
-//        captureSession = nil
-//        sessionQueue = nil
-//
-//        maskLayer?.removeFromSuperlayer()
-//        maskLayer = nil
-//
-//        request = nil
-//        stringTracker = nil
-    }
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-      
-//        maskLayer?.removeFromSuperlayer()
-//        maskLayer = nil
+        if session.isRunning {
+            session.stopRunning()
+        }
+        for input in session.inputs {
+            session.removeInput(input)
+        }
+        if let output = videoOutput {
+            session.removeOutput(output)
+        }
+        self.previewView.session = nil
+        self.videoOutput = nil
+        self.captureSession = nil
+        self.sessionQueue = nil
+        
+        self.request = nil
+        self.stringTracker = nil
     }
     
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -441,7 +402,8 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
             DispatchQueue.main.async {
                 if !self.isPausing {
-                    self.model.detectorDidScan(string: string)
+                    // init last scan in model
+                    self.model.detectorDidScan(string: nil)
                 }
 
                 self.saveButton.setTitle(self.isPausing ? self.model.pauseButtonString : self.model.applyButtonString, for: .normal)
