@@ -1,5 +1,5 @@
 //
-//  DetectorModel.swift
+//  StringDetecting.swift
 //  
 //
 //  Created by Uwe Tilemann on 02.01.22.
@@ -11,7 +11,7 @@ import Combine
 /// A protocol to handle strings to detect.
 public protocol StringDetecting {
     /// The detected string or `nil`.
-   var string: String? { get set }
+    var string: String? { get set }
     /// number of hits to count before string will be presented
     var bestHitCount: Int { get }
 
@@ -25,6 +25,9 @@ public protocol StringDetecting {
     ///   - string: The string detected or `nil` to reset `self.string`. This occurs when the detector is paused.
     /// `detectorDidScan(string:)` will be called if `bestHitCount` times a string is detected or with `nil` to reset string.
     func detectorDidScan(string: String?)
+    
+    /// Emits if the apply button is tapped
+    var actionPublisher: PassthroughSubject<AnyObject, Never> { get }
 }
 
 /// A protocol to describe some UI related stuff.

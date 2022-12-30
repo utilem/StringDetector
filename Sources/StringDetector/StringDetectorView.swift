@@ -15,7 +15,7 @@ import Combine
 
 public class StringDetectorViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let textLabel = UILabel()
-    private let saveButton = UIButton(type: .roundedRect)
+    private let applyButton = UIButton(type: .roundedRect)
     private let stackView = UIStackView()
 
     private var permissionGranted = false // Flag for permission
@@ -106,18 +106,18 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         textLabel.isUserInteractionEnabled = true
         textLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(togglePrettyPrint(_:))))
 
-        saveButton.translatesAutoresizingMaskIntoConstraints = false
-        saveButton.setTitle(model.applyButtonString, for: .normal)
-        saveButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
-        saveButton.titleLabel?.adjustsFontForContentSizeCategory = true
-        saveButton.isEnabled = true
-        saveButton.isUserInteractionEnabled = true
-        saveButton.addTarget(self, action: #selector(save(_:)), for: .touchUpInside)
+        applyButton.translatesAutoresizingMaskIntoConstraints = false
+        applyButton.setTitle(model.applyButtonString, for: .normal)
+        applyButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
+        applyButton.titleLabel?.adjustsFontForContentSizeCategory = true
+        applyButton.isEnabled = true
+        applyButton.isUserInteractionEnabled = true
+        applyButton.addTarget(self, action: #selector(apply(_:)), for: .touchUpInside)
 
         stackView.backgroundColor = .white.withAlphaComponent(0.75)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(textLabel)
-        stackView.addArrangedSubview(saveButton)
+        stackView.addArrangedSubview(applyButton)
         stackView.axis = .vertical
         stackView.spacing = 8
         stackView.alignment = .center
@@ -141,7 +141,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             stackView.bottomAnchor.constraint(equalTo: cutoutView.bottomAnchor, constant: -20),
 
             textLabel.heightAnchor.constraint(equalToConstant: 44),
-            saveButton.heightAnchor.constraint(equalToConstant: 44)
+            applyButton.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
 
@@ -406,7 +406,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
                     self.model.detectorDidScan(string: nil)
                 }
 
-                self.saveButton.setTitle(self.isPausing ? self.model.pauseButtonString : self.model.applyButtonString, for: .normal)
+                self.applyButton.setTitle(self.isPausing ? self.model.pauseButtonString : self.model.applyButtonString, for: .normal)
                 self.stackView.isHidden = false
                 self.textLabel.text = string
             }
@@ -425,7 +425,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
         }
     }
 
-    @IBAction func save(_ sender: UIButton) {
+    @IBAction func apply(_ sender: UIButton) {
         guard !isPausing else {
             restartSession()
             return
@@ -435,6 +435,7 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
             return
         }
         self.model.detectorDidScan(string: text)
+        self.model.actionPublisher.send(self)
     }
 
     @IBAction func handleTap(_ sender: UITapGestureRecognizer) {

@@ -11,6 +11,8 @@ import Combine
 /// `StringDetectorModel` is the default implementation of the `StringDetecting` protocol
 open class StringDetectorModel: ObservableObject, StringDetecting {
     
+    public var actionPublisher = PassthroughSubject<AnyObject, Never>()
+    
     public init() {
     }
 
@@ -41,10 +43,10 @@ extension StringDetectorModel: StringDetectingViewModel {
     @objc open var cornerRadius: CGFloat { return 0 }
     @objc open var drawBoxes: Bool { return true }
     
-    @objc open var applyButtonString: String { return "Apply" }
-    @objc open var pauseButtonString: String { return "Restart" }
+    @objc open var applyButtonString: String { return NSLocalizedString("Apply", comment: "") }
+    @objc open var pauseButtonString: String { return NSLocalizedString("Restart", comment: "") }
     
-    @objc open var pausingString: String { return "Pausing" }
+    @objc open var pausingString: String { return NSLocalizedString("Pausing", comment: "") }
  
     @objc open func prettyPrinted(string: String) -> String {
         return string
