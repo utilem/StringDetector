@@ -163,12 +163,13 @@ public class StringDetectorViewController: UIViewController, AVCaptureVideoDataO
 
         self.stackView.isHidden = true
 
-        if self.model.cornerRadius > 0 {
+//        if self.model.cornerRadius > 0 {
             cutoutView.layer.cornerRadius = self.model.cornerRadius
             cutoutView.layer.masksToBounds = true
             cutoutView.clipsToBounds = true
-
-            stackView.layer.cornerRadius = self.model.cornerRadius / 2
+//        }
+        if self.model.hudRadius > 0 || self.model.cornerRadius > 0 {
+            stackView.layer.cornerRadius = self.model.hudRadius > 0 ? self.model.hudRadius : self.model.cornerRadius / 2
             stackView.layer.masksToBounds = true
             stackView.clipsToBounds = true
         }

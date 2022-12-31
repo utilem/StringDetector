@@ -41,6 +41,7 @@ extension StringDetectorModel: StringDetectingViewModel {
     @objc open var cameraZoomFactor: CGFloat { return 1.0 }
     @objc open var regionOfInterest: CGSize { return CGSize(width: 1.0, height: 1.0) }
     @objc open var cornerRadius: CGFloat { return 0 }
+    @objc open var hudRadius: CGFloat { return 0 }
     @objc open var drawBoxes: Bool { return true }
     
     @objc open var applyButtonString: String { return NSLocalizedString("Apply", comment: "") }

@@ -32,10 +32,14 @@ public protocol StringDetecting {
 
 /// A protocol to describe some UI related stuff.
 public protocol StringDetectingViewModel {
-    /// The corner radius of the preview area. Half of the `radius` value is used for corner radius of the
-    /// background to display the recognized string. If `0` is returned, no rounding is done.
+    /// The corner radius of the preview area. Half of the `cornerRadius` value is used for corner radius of the
+    /// hud display. If `0` is returned, no rounding is done.
     var cornerRadius: CGFloat { get }
     
+    /// The corner radius of the hud area.  The `hudRadius` value is used for corner radius of the
+    /// hud display. If `0` is returned and `cornerRadius != 0` then `cornerRadius / 2` is used for rounding, If both are `0` no rounding is done.
+   var hudRadius: CGFloat { get }
+
     /// The CGSize of region of interest. This region will be centered in the preview of the video stream.
     /// Return (1.0, 1.0) to use the hole screen.
     var regionOfInterest: CGSize { get }
